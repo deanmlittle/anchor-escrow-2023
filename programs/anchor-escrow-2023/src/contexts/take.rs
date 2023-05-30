@@ -14,29 +14,22 @@ pub struct Take<'info> {
         associated_token::authority = maker
     )]
     pub maker_receive_ata: Account<'info, TokenAccount>,
-    #[account(
-        constraint = maker_token.key() == escrow.maker_token
-    )]
     pub maker_token: Box<Account<'info, Mint>>,
     #[account(mut)]
     pub taker: Signer<'info>,
     #[account(
-        init_if_needed,
-        payer = taker,
-        associated_token::mint = maker_token,
+        mut,
+        associated_token::mint = taker_token,
         associated_token::authority = taker
     )]
     pub taker_ata: Account<'info, TokenAccount>,
     #[account(
         init_if_needed,
         payer = taker,
-        associated_token::mint = taker_token,
+        associated_token::mint = maker_token,
         associated_token::authority = taker
     )]
     pub taker_receive_ata: Account<'info, TokenAccount>,
-    #[account(
-        constraint = taker_token.key() == escrow.taker_token
-    )]
     pub taker_token: Box<Account<'info, Mint>>,
     #[account(
         seeds = [b"auth"],
@@ -45,6 +38,7 @@ pub struct Take<'info> {
     /// CHECK: This is not dangerous because this account doesn't exist
     pub auth: UncheckedAccount<'info>,
     #[account(
+        mut,
         seeds = [b"vault", escrow.key().as_ref()],
         bump = escrow.vault_bump,
         token::mint = maker_token,
@@ -54,6 +48,8 @@ pub struct Take<'info> {
     #[account(
         mut,
         has_one = maker,
+        has_one = taker_token,
+        has_one = maker_token,
         seeds = [b"escrow", maker.key.as_ref(), escrow.seed.to_le_bytes().as_ref()],
         bump = escrow.escrow_bump,
         close = taker
@@ -76,30 +72,31 @@ impl<'info> Take<'info> {
     }
 
     pub fn empty_vault_to_taker(&self) -> Result<()> {
+        
+        let cpi_accounts = Transfer {
+            from: self.vault.to_account_info(),
+            to: self.taker_receive_ata.to_account_info(),
+            authority: self.auth.to_account_info(),
+        };
         let signer_seeds = &[
             &b"auth"[..],
             &[self.escrow.auth_bump],
         ];
-        let cpi_accounts = Transfer {
-            from: self.vault.to_account_info(),
-            to: self.taker_ata.to_account_info(),
-            authority: self.auth.to_account_info(),
-        };
         let binding = [&signer_seeds[..]];
         let ctx = CpiContext::new_with_signer(self.token_program.to_account_info(), cpi_accounts, &binding);
         transfer(ctx, self.vault.amount)
     }
 
     pub fn close_vault(&self) -> Result<()> {
-        let signer_seeds = &[
-            &b"auth"[..],
-            &[self.escrow.auth_bump],
-        ];
         let cpi_accounts = CloseAccount {
             account: self.vault.to_account_info(),
             destination: self.taker.to_account_info(),
             authority: self.auth.to_account_info(),
         };
+        let signer_seeds = &[
+            &b"auth"[..],
+            &[self.escrow.auth_bump],
+        ];
         let binding = [&signer_seeds[..]];
         let ctx = CpiContext::new_with_signer(self.token_program.to_account_info(), cpi_accounts, &binding);
         close_account(ctx)
