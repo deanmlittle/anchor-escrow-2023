@@ -3,6 +3,7 @@ seeds = true
 skip-lint = false
 [programs.localnet]
 anchor_escrow_2023 = "pCrLE3Ygn9efmpn6HC6ZDd9PKJHZEuebVERnFQ2JjXB"
+anchor_escrow_2023_timed = "8RifdHyuiX5yDUYJRGBHHpY1K8tyoQuUhR69TstPh2p1"
 
 [registry]
 url = "https://api.apr.dev"

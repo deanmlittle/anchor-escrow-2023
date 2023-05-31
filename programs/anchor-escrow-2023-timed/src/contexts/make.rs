@@ -47,7 +47,7 @@ pub struct Make<'info> {
 }
 
 impl<'info> Make<'info> {
-    pub fn init(&mut self, bumps: &BTreeMap<String, u8>, seed: u64, offer_amount: u64) -> Result<()> {
+    pub fn init(&mut self, bumps: &BTreeMap<String, u8>, seed: u64, offer_amount: u64, expiry: u64) -> Result<()> {
         let escrow = &mut self.escrow;
         escrow.maker = *self.maker.key;
         escrow.maker_token = *self.maker_token.to_account_info().key;
@@ -57,9 +57,8 @@ impl<'info> Make<'info> {
         escrow.auth_bump = *bumps.get("auth").ok_or(EscrowError::AuthBumpError)?;
         escrow.vault_bump = *bumps.get("vault").ok_or(EscrowError::VaultBumpError)?;
         escrow.escrow_bump = *bumps.get("escrow").ok_or(EscrowError::EscrowBumpError)?;
-        Ok(())
+        escrow.set_expiry_relative(expiry)
     }
-
     pub fn transfer_to_vault(
         &self,
         amount: u64

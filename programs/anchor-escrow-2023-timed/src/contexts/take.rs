@@ -61,6 +61,10 @@ pub struct Take<'info> {
 }
 
 impl<'info> Take<'info> {
+    pub fn check_expiry(&self) -> Result<()> {
+        self.escrow.check_expiry()
+    }
+
     pub fn deposit_to_maker(&self) -> Result<()> {
         let cpi_accounts = Transfer {
             from: self.taker_ata.to_account_info(),

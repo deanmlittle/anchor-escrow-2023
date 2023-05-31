@@ -161,6 +161,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "anchor-escrow-2023-timed"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+]
+
+[[package]]
 name = "anchor-lang"
 version = "0.27.0"
 source = "git+https://github.com/coral-xyz/anchor.git#c3625c8cf2ea1cb5f94859f6234c2d73c6f17928"

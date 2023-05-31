@@ -19,9 +19,9 @@ pub struct Update<'info> {
 }
 
 impl<'info> Update<'info> {
-    pub fn update(&mut self, offer_amount: u64) -> Result<()> {
+    pub fn update(&mut self, offer_amount: u64, expiry: u64 ) -> Result<()> {
         self.escrow.taker_token = *self.new_taker_token.to_account_info().key;
         self.escrow.offer_amount = offer_amount;
-        Ok(())
+        self.escrow.set_expiry_relative(expiry)
     }
 }

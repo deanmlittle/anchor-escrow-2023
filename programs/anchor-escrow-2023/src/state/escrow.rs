@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+use crate::constants::{ANCHOR_DISCRIMINATOR_BYTES, PUBKEY_BYTES, U64_BYTES, U8_BYTES};
+
 #[account]
 pub struct Escrow {
     pub maker: Pubkey,
@@ -13,5 +15,5 @@ pub struct Escrow {
 }
 
 impl Escrow {
-    pub const LEN: usize = 8 + 3 * 32 + 2 * 8 + 3 * 1;
+    pub const LEN: usize = ANCHOR_DISCRIMINATOR_BYTES + 3 * PUBKEY_BYTES + 2 * U64_BYTES + 3 * U8_BYTES;
 }

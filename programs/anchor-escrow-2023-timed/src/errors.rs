@@ -8,5 +8,9 @@ pub enum EscrowError {
     VaultBumpError,
     #[msg("Unable to get escrow bump")]
     EscrowBumpError,
+    #[msg("Your expiration is too far into the future")]
+    MaxExpiryExceeded,
+    #[msg("Escrow has expired")]
+    Expired,
 }
     
